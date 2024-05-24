@@ -5,17 +5,13 @@ const router = express.Router(); // eslint-disable-line
 
 // Get all tasks
 router.get('/', async (req, res) => {
-    try {
-        const tasks = await Task.find();
-        res.status(200).json(tasks);
-    } catch (err) {
-        res.status(500).json({ status: 500, message: 'Server error', error: err.message });
-    }
+    const tasks = await Task.find().populate('userId', 'username');
+    res.status(200).json(tasks);
 });
 
 // Create a task
 router.post('/', async (req, res) => {
-    const { title, description, deadline, priority, done } = req.body;
+    const { title, description, deadline, priority, done, userId } = req.body;
 
     // Validate priority
     if (priority && !['Low', 'Medium', 'High'].includes(priority)) {
@@ -29,6 +25,7 @@ router.post('/', async (req, res) => {
             deadline,
             priority,
             done,
+            userId,
             created_at: new Date(),
             updated_at: new Date()
         });
